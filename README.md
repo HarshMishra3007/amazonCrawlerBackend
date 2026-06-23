@@ -2,7 +2,9 @@
 
 Spring Boot backend that crawls Amazon product pages with Playwright, stores price history in Neon PostgreSQL, and exposes REST APIs for a dashboard and admin panel.
 
-**Frontend (separate repo):** [`../amazon-product-intelligence-ui`](../amazon-product-intelligence-ui) — React dashboard and admin panel.
+**Live API:** https://amazoncrawlerbackend.onrender.com  
+**Frontend repo:** https://github.com/HarshMishra3007/amazonCrawlerFrontend  
+**Backend repo:** https://github.com/HarshMishra3007/amazonCrawlerBackend
 
 ## Prerequisites
 
@@ -55,7 +57,7 @@ The app ships with a **Dockerfile** based on Microsoft's Playwright Java image �
 | `DB_PASSWORD` | Neon password |
 | `ADMIN_USERNAME` | Admin login (change from default) |
 | `ADMIN_PASSWORD` | Strong password |
-| `CORS_ALLOWED_ORIGINS` | Your frontend URL (e.g. `https://your-app.vercel.app`) |
+| `CORS_ALLOWED_ORIGINS` | Your frontend URL (e.g. `https://your-app.netlify.app`) |
 
 5. Deploy. Render health-checks `/actuator/health`.
 
@@ -155,6 +157,21 @@ curl -u admin:admin http://localhost:8080/api/admin/crawl/status
 - **ProductCrawlExecutor** — transactional snapshot persistence
 - In production (`prod` profile), Chromium runs with `--no-sandbox` flags required for containers
 
-## Amazon blocking
+## Amazon blocking and production crawl timeouts
 
 Amazon may show CAPTCHA pages. The crawler marks products as `FAILED` with reason `BLOCKED` and retries on the next scheduled cycle.
+
+### Intermittent timeouts in production
+
+On Render/cloud hosts, crawls may fail with:
+
+`Timeout exceeded waiting for #productTitle`
+
+**Reasons:**
+
+1. **Anti-bot traffic** — Cloud datacenter IPs are often flagged; Amazon serves CAPTCHA or pages without product title selectors.
+2. **Resource limits** — Playwright/Chromium needs memory; Starter-tier instances can be slow.
+3. **Scraping fragility** — No official Amazon API; DOM changes and blocking are expected.
+4. **Retries** — Up to 3 attempts with backoff (`CRAWLER_RETRY_*`); not retried on explicit `BLOCKED`.
+
+Tune `CRAWLER_TIMEOUT_MS` (e.g. `60000`–`90000`). For higher reliability: proxy (`CRAWLER_PROXY_URL`), more RAM (EC2), or Amazon SP-API.
