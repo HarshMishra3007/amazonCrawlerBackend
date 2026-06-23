@@ -26,14 +26,14 @@ public class AdminCrawlController {
     @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Map<String, String> triggerFullCrawl() {
-        crawlService.crawlAllAsync();
+        crawlService.requestFullCrawl();
         return Map.of("message", "Full crawl started");
     }
 
     @PostMapping("/{productId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Map<String, String> triggerProductCrawl(@PathVariable Long productId) {
-        crawlService.crawlProductAsync(productId);
+        crawlService.requestProductCrawl(productId);
         return Map.of("message", "Crawl started for product " + productId);
     }
 

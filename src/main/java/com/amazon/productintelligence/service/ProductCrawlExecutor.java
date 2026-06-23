@@ -27,6 +27,17 @@ public class ProductCrawlExecutor {
     private final ProductCacheService productCacheService;
 
     @Transactional
+    public void markPending(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalStateException("Product not found: " + productId));
+
+        product.setLastCrawlStatus(CrawlStatus.PENDING);
+        product.setLastCrawlAt(Instant.now());
+        productRepository.save(product);
+        productCacheService.evictAll();
+    }
+
+    @Transactional
     public void execute(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalStateException("Product not found: " + productId));
