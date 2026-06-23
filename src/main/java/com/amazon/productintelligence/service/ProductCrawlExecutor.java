@@ -34,6 +34,7 @@ public class ProductCrawlExecutor {
         product.setLastCrawlStatus(CrawlStatus.PENDING);
         product.setLastCrawlAt(Instant.now());
         productRepository.save(product);
+        productCacheService.evictAll();
 
         try {
             CrawlResult result = amazonCrawler.crawl(product.getAsin());

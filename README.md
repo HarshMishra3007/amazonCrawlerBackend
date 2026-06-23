@@ -2,9 +2,12 @@
 
 Spring Boot backend that crawls Amazon product pages with Playwright, stores price history in Neon PostgreSQL, and exposes REST APIs for a dashboard and admin panel.
 
+**Live app:** https://amazoncrawler.netlify.app  
 **Live API:** https://amazoncrawlerbackend.onrender.com  
 **Frontend repo:** https://github.com/HarshMishra3007/amazonCrawlerFrontend  
-**Backend repo:** https://github.com/HarshMishra3007/amazonCrawlerBackend
+**Backend repo:** https://github.com/HarshMishra3007/amazonCrawlerBackend  
+
+**Project overview (architecture + production notes):** [PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)
 
 ## Prerequisites
 
@@ -57,7 +60,7 @@ The app ships with a **Dockerfile** based on Microsoft's Playwright Java image �
 | `DB_PASSWORD` | Neon password |
 | `ADMIN_USERNAME` | Admin login (change from default) |
 | `ADMIN_PASSWORD` | Strong password |
-| `CORS_ALLOWED_ORIGINS` | Your frontend URL (e.g. `https://your-app.netlify.app`) |
+| `CORS_ALLOWED_ORIGINS` | `https://amazoncrawler.netlify.app,http://localhost:5173` |
 
 5. Deploy. Render health-checks `/actuator/health`.
 
@@ -153,7 +156,7 @@ curl -u admin:admin http://localhost:8080/api/admin/crawl/status
 
 - **PlaywrightAmazonCrawler** — headless Chromium via Playwright
 - **PageParser** — CSS selector extraction with fallbacks
-- **CrawlService** — batch orchestration, rate limiting, concurrency lock
+- **CrawlService** — batch orchestration, serial crawl lock, delay between products
 - **ProductCrawlExecutor** — transactional snapshot persistence
 - In production (`prod` profile), Chromium runs with `--no-sandbox` flags required for containers
 
