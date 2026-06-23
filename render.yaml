@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: product-intelligence-api
+    runtime: docker
+    plan: starter
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: ADMIN_USERNAME
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: CRAWL_CRON
+        value: 0 0 */6 * * *
+      - key: CRAWLER_DELAY_MS
+        value: 2500
+      - key: CRAWLER_TIMEOUT_MS
+        value: 30000
+      - key: AMAZON_BASE_URL
+        value: https://www.amazon.in
